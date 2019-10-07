@@ -3,6 +3,7 @@ import pandas as pd
 import utilityOpenBedFile
 
 def initIntergenicFile(intergenicBedFilePath):
+    intergenicBedFilePath = './featuresData/intersectionWithKnownGenes.bed'
     content = []
     content = utilityOpenBedFile.getBedFileContentWithTab(intergenicBedFilePath)
 
