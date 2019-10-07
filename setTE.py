@@ -29,7 +29,7 @@ def getElandFileContent(path):
 
 # read TE instersection table with reads
 def readIntersectionWithSequences(intersectionFilePath):
-    intersectionFilePath = './featuresData/repbase.out.eland'
+    # for debug: intersectionFilePath = './featuresData/repbase.out.eland'
     content = getElandFileContent(intersectionFilePath)
     df = pd.DataFrame(data=content[1:], columns=content[0])
     column = list(df['probe_id'])
