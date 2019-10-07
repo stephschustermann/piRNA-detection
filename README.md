@@ -11,7 +11,9 @@ These instructions will get you a copy of the project up and running on your loc
 
 You will need the following files to use all the features in this project:
 
-1. Transposable Elements file in order to get all the mappings to TE
+1. Transposable Elements file
+
+The program expects an eland based file with the format example shown above:
 
 ```
 trans_id        trans_coord     target_seq      probe_id        probe_seq       num_mismatch    strand
