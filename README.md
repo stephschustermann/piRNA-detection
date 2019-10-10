@@ -31,8 +31,9 @@ HERVK3I endogenous retrovirus   Homo sapiens    332     GTTAATTCTCAGACA HWI-ST13
 
 2. Intragenic file
 
+This BED file was created using the function intersect from bedtools (see more - https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html) using *-wa* flag in order to get the intra genic sequences.
+
 The program expects a bed based file with the format example shown above:
-This BED file was created using the function intersect from bedtools (see more - https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html) using *-wa* flag in order to get the intra genic sequences
 
 ```
 chr1	14406	14445	HWI-ST1391:140326:C441WACXX:7:2314:11417:70781 1:N:0: CAACTAA	-
