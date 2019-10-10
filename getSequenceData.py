@@ -40,8 +40,11 @@ sequencesDataFrame.index = range(len(sequencesDataFrame.index))
 
 sequencesDataFrame['heterochromatinDistance'] = np.empty((len(sequencesDataFrame), 0)).tolist()
 sequencesDataFrame['isInCluster'] = np.empty((len(sequencesDataFrame), 0)).tolist()
-sequencesDataFrame['isIntergenic'] = np.empty((len(sequencesDataFrame), 0)).tolist()
+sequencesDataFrame['isIntragenic'] = np.empty((len(sequencesDataFrame), 0)).tolist()
+sequencesDataFrame['geneSense'] = np.empty((len(sequencesDataFrame), 0)).tolist()
 sequencesDataFrame['isTE'] = np.empty((len(sequencesDataFrame), 0)).tolist()
+sequencesDataFrame['teType'] = np.empty((len(sequencesDataFrame), 0)).tolist()
+sequencesDataFrame['teSense'] = np.empty((len(sequencesDataFrame), 0)).tolist()
 print('adding features')
 # for each sequence, add a feature
 for index, sequence in sequencesDataFrame.iterrows():
@@ -55,14 +58,26 @@ for index, sequence in sequencesDataFrame.iterrows():
         isInClusterResult = setInKnownCluster.isSequenceInsideCluster(knownClustersDataFrame, sequence['probe_id'])
         sequencesDataFrame.at[index, 'isInCluster'] = isInClusterResult
         
-        # add isIntergenic
-        # TODO change this function to be dictionary
-        isIntergenicResult = setIntergenic.isIntergenic(intergenicDataFrame, sequence)
-        sequencesDataFrame.at[index, 'isIntergenic'] = isIntergenicResult
+        # add isIntragenic and sense
+        isIntergenicResult = setIntergenic.isIntragenic(intergenicDataFrame, sequence)
+        if not isIntergenicResult:
+            sequencesDataFrame.at[index, 'isIntragenic'] = isIntergenicResult
+            sequencesDataFrame.at[index, 'geneSense'] = -1
+        else:
+            sequencesDataFrame.at[index, 'isIntragenic'] = True
+            if isIntergenicResult[4] == '+':
+                sequencesDataFrame.at[index, 'geneSense'] = 1
+            else:
+                sequencesDataFrame.at[index, 'geneSense'] = 0
         
         # add maps to TE
         isTE = setTE.mapsToTranposableElement(transposonElementsDictionary, sequence['probe_id'])
-        sequencesDataFrame.at[index, 'isTE'] = isTE
+        if not isTE:
+            sequencesDataFrame.at[index, 'isTE'] = isTE
+        else:
+            sequencesDataFrame.at[index, 'isTE'] = True
+            sequencesDataFrame.at[index, 'teType'] = isTE[0]['type'] #TODO https://github.com/users/stephschustermann/projects/1#card-27427098
+            sequencesDataFrame.at[index, 'teSense']= isTE[0]['strand'] #TODO https://github.com/users/stephschustermann/projects/1#card-27427098
     else:
         sequencesDataFrame = sequencesDataFrame.drop(sequencesDataFrame.index[index])
 
@@ -96,7 +111,7 @@ for read in sequencesProbeId:
 
     if numOfMappings > 0:
         features.append((sum(sequencesOfRead['isInCluster'])/numOfMappings)*100)
-        features.append((sum(sequencesOfRead['isIntergenic'])/numOfMappings)*100)
+        features.append((sum(sequencesOfRead['isIntragenic'])/numOfMappings)*100)
         features.append((sum(sequencesOfRead['isTE'])/numOfMappings)*100)
         total25 = len(pydash.collections.filter_(list(sequencesOfRead['heterochromatinDistance']), lambda x: x <= dist25))
         total50 = len(pydash.collections.filter_(list(sequencesOfRead['heterochromatinDistance']), lambda x: x <= dist50 and x > dist25))
@@ -122,7 +137,7 @@ for read in sequencesProbeId:
     readFeaturesList.append(features)
         
 
-readFeaturesDataFrame = pd.DataFrame(data=readFeaturesList, columns=['sequence', 'isInCluster', 'isIntergenic', 'isTE', 'Q25', 'Q50', 'Q75', 'Q100', 'numOfMappings', 'label'])
+readFeaturesDataFrame = pd.DataFrame(data=readFeaturesList, columns=['sequence', 'isInCluster', 'isIntragenic', 'isTE', 'Q25', 'Q50', 'Q75', 'Q100', 'numOfMappings', 'label'])
 print('read features finish, creating read features data file')
 # write all sequences in data frame
 readFeaturesDataFrame.to_csv('./featuresData/allReadFeaturesData.txt', index=False)

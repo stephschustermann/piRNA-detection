@@ -3,7 +3,6 @@ import pandas as pd
 import utilityOpenBedFile
 
 def initIntergenicFile(intergenicBedFilePath):
-    intergenicBedFilePath = './featuresData/intersectionWithKnownGenes.bed'
     content = []
     content = utilityOpenBedFile.getBedFileContentWithTab(intergenicBedFilePath)
 
@@ -26,10 +25,11 @@ def initIntergenicFile(intergenicBedFilePath):
 
 # check if the current coordinate is intergenic
 # returns TRUE is the coordinate is intergenic otherwise FALSE
-def isIntergenic(geneDict, sequence):
+def isIntragenic(geneDict, sequence):
     if sequence['name'] in geneDict: # TODO how do we want to separate all the matches?
-        return geneDict[sequence['name']] # is INTRA genic and not between genes
+        allSequences = geneDict[sequence['name']]
+        for row in allSequences:
+            if row['chromStart'] == sequence['chromStart'] and row['chromEnd'] == sequence['chromEnd'] and row['chrom'] == sequence['chrom']:
+                return row  # is INTRA genic and not between genes
     
-    return True
-
-#isIntergenic({ 'chrom': 'chr22', 'chromStart': 10736285, 'chromEnd': 10736295 }, 'output.bed')
+    return False
