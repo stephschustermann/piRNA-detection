@@ -13,7 +13,7 @@ You will need the following files to use all the features in this project:
 
 1. Transposable Elements file
 
-The program expects an eland based file with the format example shown above:
+The program expects an eland based file with the format example shown below:
 
 ```
 trans_id        trans_coord     target_seq      probe_id        probe_seq       num_mismatch    strand
@@ -33,7 +33,7 @@ HERVK3I endogenous retrovirus   Homo sapiens    332     GTTAATTCTCAGACA HWI-ST13
 
 This BED file was created using the function intersect from bedtools (see more - https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html) using *-wa* flag in order to get the intra genic sequences.
 
-The program expects a bed based file with the format example shown above:
+The program expects a bed based file with the format example shown below:
 
 ```
 chr1	14406	14445	HWI-ST1391:140326:C441WACXX:7:2314:11417:70781 1:N:0: CAACTAA	-
