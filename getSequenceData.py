@@ -1,19 +1,19 @@
 # import and init files for features
-import heterochromatinDistance
-import isInCluster
-import isIntergenic
-import isTransposonElement
-import numOfMapping
-import label
-import getChromosomeLength
+import setDistanceFromHeterochromatin
+import setInKnownCluster
+import setIntergenic
+import setTE
+import setNumOfMappings
+import setLabel
+import utilityGetChromosomeLenght
 
 print('init files')
-heterochromatinDataFrame = heterochromatinDistance.initHeterochromatinFiles()
-knownClustersDataFrame = isInCluster.initKnownClustersFile('./featuresData/intersectionWithKnownClusters.bed')
-transposonElementsDictionary = isTransposonElement.readIntersectionWithSequences('./featuresData/repbase.out.eland')
-labelsTable = label.readLabelsFile('./featuresData/sncRNA_labels.txt')
-intergenicDataFrame = isIntergenic.initIntergenicFile('./featuresData/intersectionWithKnownGenes.bed')
-chromosomeLengths = getChromosomeLength.initChromosomeLenght('./featuresData/hg38.chrom.sizes.txt')
+heterochromatinDataFrame = setDistanceFromHeterochromatin.initHeterochromatinFiles()
+knownClustersDataFrame = setInKnownCluster.initKnownClustersFile('./featuresData/intersectionWithKnownClusters.bed')
+transposonElementsDictionary = setTE.readIntersectionWithSequences('./featuresData/repbase.out.eland')
+labelsTable = setLabel.readLabelsFile('./featuresData/sncRNA_labels.txt')
+intergenicDataFrame = setIntergenic.initIntergenicFile('./featuresData/intersectionWithKnownGenes.bed')
+chromosomeLengths = utilityGetChromosomeLenght.initChromosomeLenght('./featuresData/hg38.chrom.sizes.txt')
 
 # convert the eland file into bed file
 import convertElandToBed
@@ -48,19 +48,20 @@ for index, sequence in sequencesDataFrame.iterrows():
     # Only known chromosomes
     if sequence['chrom'] in chromosomeLengths:
         # add heterochromatinDistance
-        chromatinDistance = heterochromatinDistance.getClosestHeterochromatinDistance(heterochromatinDataFrame, sequence)
+        chromatinDistance = setDistanceFromHeterochromatin.getClosestHeterochromatinDistance(heterochromatinDataFrame, sequence)
         sequencesDataFrame.at[index, 'heterochromatinDistance'] = chromatinDistance / int(chromosomeLengths[sequence['chrom']]) # normal to chromosome length
         
         # add isInCluster
-        isInClusterResult = isInCluster.isSequenceInsideCluster(knownClustersDataFrame, sequence['probe_id'])
+        isInClusterResult = setInKnownCluster.isSequenceInsideCluster(knownClustersDataFrame, sequence['probe_id'])
         sequencesDataFrame.at[index, 'isInCluster'] = isInClusterResult
         
         # add isIntergenic
-        isIntergenicResult = isIntergenic.isIntergenic(intergenicDataFrame, sequence)
+        # TODO change this function to be dictionary
+        isIntergenicResult = setIntergenic.isIntergenic(intergenicDataFrame, sequence)
         sequencesDataFrame.at[index, 'isIntergenic'] = isIntergenicResult
         
         # add maps to TE
-        isTE = isTransposonElement.mapsToTranposableElement(transposonElementsDictionary, sequence['probe_id'])
+        isTE = setTE.mapsToTranposableElement(transposonElementsDictionary, sequence['probe_id'])
         sequencesDataFrame.at[index, 'isTE'] = isTE
     else:
         sequencesDataFrame = sequencesDataFrame.drop(sequencesDataFrame.index[index])
@@ -80,7 +81,7 @@ dist75 = np.percentile(heterochromatinDistances, 75)
 dist100 = np.percentile(heterochromatinDistances, 100)
 
 print('read number of sequences per each read')
-numOfMappingInGenome = numOfMapping.numOfMappingPerRead(sequencesDataFrame)
+numOfMappingInGenome = setNumOfMappings.numOfMappingPerRead(sequencesDataFrame)
 
 # import pydash
 import pydash
@@ -90,7 +91,7 @@ for read in sequencesProbeId:
     features = []
     features.append(read)
     
-    numOfMappings = numOfMapping.getNumOfMapping(numOfMappingInGenome, read)
+    numOfMappings = setNumOfMappings.getNumOfMapping(numOfMappingInGenome, read)
     sequencesOfRead = sequencesDataFrame.loc[sequencesDataFrame['probe_id'] == read]
 
     if numOfMappings > 0:
@@ -116,7 +117,7 @@ for read in sequencesProbeId:
         features.append(0) # 100
         
     features.append(numOfMappings)
-    labelName = label.findLabel(labelsTable, read)
+    labelName = setLabel.findLabel(labelsTable, read)
     features.append(labelName)
     readFeaturesList.append(features)
         
