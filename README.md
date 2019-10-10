@@ -29,6 +29,21 @@ HERVK3I endogenous retrovirus   Homo sapiens    332     GTTAATTCTCAGACA HWI-ST13
 
 ```
 
+2. Intragenic file
+
+The program expects a bed based file with the format example shown above:
+This BED file was created using the function intersect from bedtools (see more - https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html) using *-wa* flag in order to get the intra genic sequences
+
+```
+chr1	14406	14445	HWI-ST1391:140326:C441WACXX:7:2314:11417:70781 1:N:0: CAACTAA	-
+chr1	14406	14445	HWI-ST1391:140326:C441WACXX:7:2314:11417:70781 1:N:0: CAACTAA	-
+chr1	14574	14608	HWI-ST1391:140326:C441WACXX:7:2301:12782:18038 1:N:0: CAACTAA	-
+chr1	14630	14670	HWI-ST1391:140326:C441WACXX:7:1315:3844:94402 1:N:0: CAACTAA	-
+chr1	14643	14682	HWI-ST1391:140326:C441WACXX:7:1212:19864:22541 1:N:0: CAACTAA	-
+chr1	14646	14688	HWI-ST1391:140326:C441WACXX:7:1108:3792:24233 1:N:0: CACCTAA	-
+chr1	14680	14710	HWI-ST1391:140326:C441WACXX:7:1309:16224:44217 1:N:0: CAACTAA	-
+```
+
 ### Installing
 
 A step by step series of examples that tell you how to get a development env running
