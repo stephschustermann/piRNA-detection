@@ -26,7 +26,8 @@ def initIntergenicFile(intergenicBedFilePath):
 # check if the current coordinate is intergenic
 # returns TRUE is the coordinate is intergenic otherwise FALSE
 def isIntragenic(geneDict, sequence):
-    if sequence['name'] in geneDict: # TODO how do we want to separate all the matches?
+    #TODO we need to somehow get the gene info, such as type, utr3/5, intron/exon
+    if sequence['name'] in geneDict:
         allSequences = geneDict[sequence['name']]
         for row in allSequences:
             if row['chromStart'] == sequence['chromStart'] and row['chromEnd'] == sequence['chromEnd'] and row['chrom'] == sequence['chrom']:

@@ -44,7 +44,7 @@ sequencesDataFrame['isIntragenic'] = np.empty((len(sequencesDataFrame), 0)).toli
 sequencesDataFrame['geneSense'] = np.empty((len(sequencesDataFrame), 0)).tolist()
 sequencesDataFrame['isTE'] = np.empty((len(sequencesDataFrame), 0)).tolist()
 sequencesDataFrame['teType'] = np.empty((len(sequencesDataFrame), 0)).tolist()
-sequencesDataFrame['teSense'] = np.empty((len(sequencesDataFrame), 0)).tolist()
+sequencesDataFrame['teAntisense'] = np.empty((len(sequencesDataFrame), 0)).tolist()
 print('adding features')
 # for each sequence, add a feature
 for index, sequence in sequencesDataFrame.iterrows():
@@ -76,8 +76,8 @@ for index, sequence in sequencesDataFrame.iterrows():
             sequencesDataFrame.at[index, 'isTE'] = isTE
         else:
             sequencesDataFrame.at[index, 'isTE'] = True
-            sequencesDataFrame.at[index, 'teType'] = isTE[0]['type'] #TODO https://github.com/users/stephschustermann/projects/1#card-27427098
-            sequencesDataFrame.at[index, 'teSense']= isTE[0]['strand'] #TODO https://github.com/users/stephschustermann/projects/1#card-27427098
+            sequencesDataFrame.at[index, 'teType'] = isTE['types']
+            sequencesDataFrame.at[index, 'teAntisense']= isTE['antisense']
     else:
         sequencesDataFrame = sequencesDataFrame.drop(sequencesDataFrame.index[index])
 

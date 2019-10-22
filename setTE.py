@@ -34,9 +34,25 @@ def readIntersectionWithSequences(intersectionFilePath):
     df = pd.DataFrame(data=content[1:], columns=content[0])
     column = list(df['probe_id'])
     return Counter(column)
+
+def getReturnObject(teList):
+    result = {}
+    result['antisense'] = False
+    types = list(df['type'])
+    types = list(dict.fromkeys(types))
+    result['types'] = types
+    for te in teList:
+        if te['strand'] == '-':
+            result['antisense'] = True
+    return result
+
 # if read exists in TE intersection table return true
 def mapsToTranposableElement(intersectionTEtable, sequenceId):
+    # if the sequence maps to more than one TE
+    # return all the TE types
+    # return true for mapping
+    # return true if there is at least one TE mapped antisense
     if intersectionTEtable[sequenceId] > 0:
-        return  df.loc[df['probe_id'] == sequenceId] # TODO https://github.com/users/stephschustermann/projects/1#card-27427098
+        return  getReturnObject(df.loc[df['probe_id'] == sequenceId])
     return False
 
