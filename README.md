@@ -1,6 +1,5 @@
-# piRNA-detection
+# piRNA-detection via multidimensional small RNA clustering
 
-piRNA detection via multidimensional small RNA clustering
 Piwi-interacting RNAs (piRNA) are a novel class of small RNA molecules thought to mediate retrotransposon silecing. Since transposable elements (TEs) can serve as mutagenic factors that contribute to genomic instability, piRNA function is extremely important for genome defense.
 
 ## Getting Started
