@@ -27,10 +27,10 @@ def initIntergenicFile(intergenicBedFilePath):
 # returns TRUE is the coordinate is intergenic otherwise FALSE
 def isIntragenic(geneDict, sequence):
     #TODO we need to somehow get the gene info, such as type, utr3/5, intron/exon
-    if sequence['name'] in geneDict:
-        allSequences = geneDict[sequence['name']]
+    if sequence['probe_id'] in geneDict:
+        allSequences = geneDict[sequence['probe_id']]
         for row in allSequences:
-            if row['chromStart'] == sequence['chromStart'] and row['chromEnd'] == sequence['chromEnd'] and row['chrom'] == sequence['chrom']:
+            if row[1] == sequence['chromStart'] and row[2] == sequence['chromEnd'] and row[0] == sequence['chrom']:
                 return row  # is INTRA genic and not between genes
     
     return False

@@ -10,21 +10,23 @@ import utilityGetChromosomeLenght
 print('init files')
 heterochromatinDataFrame = setDistanceFromHeterochromatin.initHeterochromatinFiles()
 knownClustersDataFrame = setInKnownCluster.initKnownClustersFile('./featuresData/intersectionWithKnownClusters.bed')
-transposonElementsDictionary = setTE.readIntersectionWithSequences('./featuresData/repbase.out.eland')
+transposonElementsDF = setTE.getDataframeTE('./featuresData/repbase.out.eland')
+transposonElementsDictionary = setTE.readIntersectionWithSequences(transposonElementsDF)
+transposonElementsTypes = setTE.getTEtypes(transposonElementsDF)
 labelsTable = setLabel.readLabelsFile('./featuresData/sncRNA_labels.txt')
 intergenicDataFrame = setIntergenic.initIntergenicFile('./featuresData/intersectionWithKnownGenes.bed')
 chromosomeLengths = utilityGetChromosomeLenght.initChromosomeLenght('./featuresData/hg38.chrom.sizes.txt')
 
 # convert the eland file into bed file
-import convertElandToBed
+import utilityConvertElandToBed
 smallRNAFileName = './featuresData/smallRNASequences.bed'
 print('convert genome file to bed')
-convertElandToBed.createBedFileFromEland(smallRNAFileName, './featuresData/genome.out.eland')
+utilityConvertElandToBed.createBedFileFromEland(smallRNAFileName, './featuresData/genome.out.eland')
                           
 # read smallRNA sequences file
-import openBedFile
+import utilityOpenBedFile
 sequences = []
-sequences = openBedFile.getBedFileContentWithTab(smallRNAFileName)
+sequences = utilityOpenBedFile.getBedFileContentWithTab(smallRNAFileName)
 
 # convert sequences to data frame
 import pandas as pd
@@ -43,8 +45,10 @@ sequencesDataFrame['isInCluster'] = np.empty((len(sequencesDataFrame), 0)).tolis
 sequencesDataFrame['isIntragenic'] = np.empty((len(sequencesDataFrame), 0)).tolist()
 sequencesDataFrame['geneSense'] = np.empty((len(sequencesDataFrame), 0)).tolist()
 sequencesDataFrame['isTE'] = np.empty((len(sequencesDataFrame), 0)).tolist()
-sequencesDataFrame['teType'] = np.empty((len(sequencesDataFrame), 0)).tolist()
 sequencesDataFrame['teAntisense'] = np.empty((len(sequencesDataFrame), 0)).tolist()
+
+for teType in transposonElementsTypes:
+    sequencesDataFrame[teType] = np.empty((len(sequencesDataFrame), 0)).tolist()
 print('adding features')
 # for each sequence, add a feature
 for index, sequence in sequencesDataFrame.iterrows():
@@ -71,14 +75,15 @@ for index, sequence in sequencesDataFrame.iterrows():
                 sequencesDataFrame.at[index, 'geneSense'] = 0
         
         # add maps to TE
-        isTE = setTE.mapsToTranposableElement(transposonElementsDictionary, sequence['probe_id'])
+        isTE = setTE.mapsToTranposableElement(transposonElementsDictionary, sequence['probe_id'], transposonElementsDF)
         if not isTE:
             sequencesDataFrame.at[index, 'isTE'] = isTE
         else:
             sequencesDataFrame.at[index, 'isTE'] = True
-            sequencesDataFrame.at[index, 'teType'] = isTE['types']
             sequencesDataFrame.at[index, 'teAntisense']= isTE['antisense']
-    else:
+            for teType in isTE['types']:
+                sequencesDataFrame.at[index, teType] = 1
+    else: #not a defined chromosome so need to drop
         sequencesDataFrame = sequencesDataFrame.drop(sequencesDataFrame.index[index])
 
 print('features finish, creating sequences data file')

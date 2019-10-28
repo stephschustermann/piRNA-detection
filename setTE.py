@@ -2,8 +2,6 @@
 import pandas as pd
 from collections import Counter
 
-df = []
-
 def getElandFileContent(path):
     content = []
     header = True
@@ -26,33 +24,39 @@ def getElandFileContent(path):
                 content.append([probe_id, strand, teType])
     return content
 
-
-# read TE instersection table with reads
-def readIntersectionWithSequences(intersectionFilePath):
-    # for debug: intersectionFilePath = './featuresData/repbase.out.eland'
+def getDataframeTE(intersectionFilePath):
+    # intersectionFilePath = './featuresData/repbase.out.eland'
     content = getElandFileContent(intersectionFilePath)
     df = pd.DataFrame(data=content[1:], columns=content[0])
+    return df
+# read TE instersection table with reads
+def readIntersectionWithSequences(df):
     column = list(df['probe_id'])
     return Counter(column)
 
-def getReturnObject(teList):
+def getTEtypes(df):
+    types = list(df['type'])
+    return list(dict.fromkeys(types)) # unique types
+
+def getReturnObject(teList, df):
     result = {}
     result['antisense'] = False
-    types = list(df['type'])
+    types = []
+    for index, te in teList.iterrows():
+        types.append(te['type'])
+        if te[1] == '-':
+            result['antisense'] = True
     types = list(dict.fromkeys(types))
     result['types'] = types
-    for te in teList:
-        if te['strand'] == '-':
-            result['antisense'] = True
     return result
 
 # if read exists in TE intersection table return true
-def mapsToTranposableElement(intersectionTEtable, sequenceId):
+def mapsToTranposableElement(intersectionTEtable, sequenceId, df):
     # if the sequence maps to more than one TE
     # return all the TE types
     # return true for mapping
     # return true if there is at least one TE mapped antisense
     if intersectionTEtable[sequenceId] > 0:
-        return  getReturnObject(df.loc[df['probe_id'] == sequenceId])
+        return  getReturnObject(df.loc[df['probe_id'] == sequenceId], df)
     return False
 
